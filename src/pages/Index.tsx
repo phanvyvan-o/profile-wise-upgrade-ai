@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, MessageSquare, Book, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { useNavigate } from "react-router-dom";
+
 const Index = () => {
   const navigate = useNavigate();
   return <div className="min-h-screen flex flex-col">
@@ -51,7 +53,7 @@ const Index = () => {
           <p className="text-lg text-muted-foreground max-w-[800px] mx-auto mb-8">
             Ứng dụng của chúng tôi sử dụng công nghệ AI tiên tiến để phân tích và cải thiện hồ sơ xin việc của bạn, giúp bạn nổi bật trong mắt nhà tuyển dụng.
           </p>
-          <Button onClick={() => navigate('/upload')} variant="secondary" size="lg">
+          <Button onClick={() => navigate('/upload')} variant="default" size="lg">
             Cải thiện hồ sơ của bạn
           </Button>
         </section>
@@ -64,4 +66,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;
