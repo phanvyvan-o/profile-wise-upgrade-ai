@@ -8,7 +8,6 @@ import Index from "./pages/Index";
 import Upload from "./pages/Upload";
 import Evaluation from "./pages/Evaluation";
 import MockInterview from "./pages/MockInterview";
-import JDAnalysis from "./pages/JDAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,7 +23,6 @@ const App = () => (
           <Route path="/upload" element={<Upload />} />
           <Route path="/evaluation" element={<Evaluation />} />
           <Route path="/mock-interview" element={<MockInterview />} />
-          <Route path="/jd-analysis" element={<JDAnalysis />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

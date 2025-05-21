@@ -29,16 +29,18 @@ const InterviewQuestion = ({
   const [recordingAudio, setRecordingAudio] = useState(false);
 
   useEffect(() => {
-    // Start timer after 3 seconds
-    const timerDelay = setTimeout(() => {
-      setStartTime(Date.now());
-      setTimerRunning(true);
-    }, 3000);
-
-    return () => {
-      clearTimeout(timerDelay);
-    };
-  }, []);
+    // Only start the timer if it hasn't been started yet
+    if (!startTime) {
+      const timerDelay = setTimeout(() => {
+        setStartTime(Date.now());
+        setTimerRunning(true);
+      }, 3000);
+      
+      return () => {
+        clearTimeout(timerDelay);
+      };
+    }
+  }, [startTime]);
 
   useEffect(() => {
     let interval: number;
@@ -53,6 +55,13 @@ const InterviewQuestion = ({
       if (interval) clearInterval(interval);
     };
   }, [timerRunning, startTime]);
+
+  // Update the useEffect to reset state when the question changes
+  useEffect(() => {
+    return () => {
+      // Don't reset anything when unmounting
+    };
+  }, [question]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, MessageSquare, Book, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
@@ -46,8 +46,8 @@ const Index = () => {
             
             <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
               <FeatureCard
-                title="Đánh giá mô tả công việc"
-                description="So sánh hồ sơ của bạn với mô tả công việc mong muốn để xác định điểm mạnh và lĩnh vực cần cải thiện."
+                title="Đánh giá hồ sơ"
+                description="Nhận đánh giá chi tiết về hồ sơ của bạn và gợi ý cải thiện để tăng cơ hội thành công khi ứng tuyển."
                 icon={<Book className="h-5 w-5" />}
               />
             </div>
@@ -72,7 +72,7 @@ const Index = () => {
             variant="secondary"
             size="lg"
           >
-            Nâng cao hồ sơ của bạn
+            Cải thiện hồ sơ của bạn
           </Button>
         </section>
       </main>

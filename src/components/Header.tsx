@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from "react-router-dom";
-import { FileText, MessageSquare, Book } from "lucide-react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { FileText, MessageSquare } from "lucide-react";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -9,7 +9,10 @@ const Header = () => {
   
   return (
     <header className="w-full py-4 px-6 flex items-center justify-between border-b">
-      <div className="flex items-center gap-2">
+      <div 
+        className="flex items-center gap-2 cursor-pointer" 
+        onClick={() => navigate("/")}
+      >
         <div className="flex gap-1 items-center">
           <span className="font-bold text-2xl text-resume-primary">Resume</span>
           <span className="font-bold text-2xl">AI</span>
@@ -18,20 +21,20 @@ const Header = () => {
       
       <nav className="hidden md:flex items-center gap-6">
         <Button 
-          onClick={() => navigate("/")}
-          variant={location.pathname === "/" ? "default" : "ghost"} 
+          onClick={() => navigate("/upload")}
+          variant={location.pathname === "/upload" ? "default" : "ghost"} 
           className="gap-2"
         >
           <FileText size={18} />
           <span>Hồ sơ</span>
         </Button>
         <Button 
-          onClick={() => navigate("/jd-analysis")}
-          variant={location.pathname === "/jd-analysis" ? "default" : "ghost"} 
+          onClick={() => navigate("/evaluation")}
+          variant={location.pathname === "/evaluation" ? "default" : "ghost"} 
           className="gap-2"
         >
-          <Book size={18} />
-          <span>JD Phân tích</span>
+          <FileText size={18} />
+          <span>Đánh giá</span>
         </Button>
         <Button 
           onClick={() => navigate("/mock-interview")}
