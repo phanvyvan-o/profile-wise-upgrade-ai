@@ -59,7 +59,7 @@ const Index = () => {
       
       <footer className="py-6 border-t">
         <div className="container max-w-7xl mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 Resume AI. Tất cả các quyền được bảo lưu.</p>
+          <p>© 2025 Resume AI.</p>
         </div>
       </footer>
     </div>;
