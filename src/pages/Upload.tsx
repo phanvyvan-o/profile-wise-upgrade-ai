@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Plus, ArrowRight, MessageSquare } from "lucide-react";
 import Header from "@/components/Header";
 import FileUpload from "@/components/FileUpload";
 import SectionInput from "@/components/SectionInput";
