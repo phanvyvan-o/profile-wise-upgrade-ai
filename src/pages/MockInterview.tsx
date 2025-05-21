@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,12 +8,10 @@ import { geminiApi } from "@/services/geminiApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
-
 interface InterviewQuestionType {
   question: string;
   hint: string;
 }
-
 interface AnswerResult {
   question: string;
   answer: string;
@@ -23,7 +20,6 @@ interface AnswerResult {
   improvementPoints: string[];
   score: number;
 }
-
 const MockInterview = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState<InterviewQuestionType[]>([]);
@@ -33,13 +29,11 @@ const MockInterview = () => {
   const [interviewFinished, setInterviewFinished] = useState(false);
   const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
   const [totalTime, setTotalTime] = useState(0);
-  
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         // For a real implementation, this should use the resume data to generate relevant questions
         const resumeData = localStorage.getItem("resumeSectionsForInterview");
-        
         if (!resumeData) {
           // No resume data found, use default job type
           const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
@@ -50,7 +44,6 @@ const MockInterview = () => {
           const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
           setQuestions(fetchedQuestions);
         }
-        
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -58,21 +51,17 @@ const MockInterview = () => {
         setIsLoading(false);
       }
     };
-    
     fetchQuestions();
   }, []);
-  
   const startInterview = () => {
     setInterviewStarted(true);
   };
-  
   const handleAnswerSubmit = async (answer: string, timeSpent: number) => {
     const currentQuestion = questions[currentQuestionIndex];
-    
     try {
       // Evaluate the answer
       const evaluation = await geminiApi.evaluateAnswer(currentQuestion.question, answer);
-      
+
       // Add to results
       const result: AnswerResult = {
         question: currentQuestion.question,
@@ -82,10 +71,9 @@ const MockInterview = () => {
         improvementPoints: evaluation.improvementPoints,
         score: evaluation.score
       };
-      
       setAnswerResults([...answerResults, result]);
       setTotalTime(totalTime + timeSpent);
-      
+
       // Move to next question or finish
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -97,50 +85,37 @@ const MockInterview = () => {
       toast.error("Đã xảy ra lỗi khi đánh giá câu trả lời. Vui lòng thử lại.");
     }
   };
-  
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
-  
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return "text-green-600";
     if (score >= 0.6) return "text-amber-600";
     return "text-red-600";
   };
-  
   const getAverageScore = () => {
     if (answerResults.length === 0) return 0;
     const total = answerResults.reduce((sum, result) => sum + result.score, 0);
     return total / answerResults.length;
   };
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 container max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate("/")}
-          >
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-3xl font-bold">Phỏng vấn thử</h1>
         </div>
         
-        {isLoading ? (
-          <div className="py-20 text-center">
+        {isLoading ? <div className="py-20 text-center">
             <div className="mb-4 text-lg font-medium">Đang chuẩn bị câu hỏi phỏng vấn...</div>
             <Progress value={70} className="w-full max-w-md mx-auto" />
-          </div>
-        ) : (
-          <>
-            {!interviewStarted ? (
-              <div className="max-w-3xl mx-auto text-center py-12">
+          </div> : <>
+            {!interviewStarted ? <div className="max-w-3xl mx-auto text-center py-12">
                 <h2 className="text-2xl font-bold mb-4">Sẵn sàng cho phỏng vấn?</h2>
                 <p className="text-lg text-muted-foreground mb-8">
                   Chúng tôi đã chuẩn bị {questions.length} câu hỏi phỏng vấn phù hợp với hồ sơ của bạn. 
@@ -159,33 +134,16 @@ const MockInterview = () => {
                   </div>
                 </div>
                 
-                <Button 
-                  onClick={startInterview} 
-                  size="lg"
-                  className="gap-2"
-                >
+                <Button onClick={startInterview} size="lg" className="gap-2">
                   <span>Bắt đầu phỏng vấn</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-              </div>
-            ) : !interviewFinished ? (
-              <div className="py-8">
+              </div> : !interviewFinished ? <div className="py-8">
                 {/* Timer at the top right corner */}
-                <div className="timer">
-                  <Clock className="h-4 w-4 inline-block mr-2" />
-                  {formatTime(totalTime)}
-                </div>
                 
-                <InterviewQuestion
-                  question={questions[currentQuestionIndex].question}
-                  questionNumber={currentQuestionIndex + 1}
-                  totalQuestions={questions.length}
-                  hint={questions[currentQuestionIndex].hint}
-                  onSubmit={handleAnswerSubmit}
-                />
-              </div>
-            ) : (
-              <div className="py-8">
+                
+                <InterviewQuestion question={questions[currentQuestionIndex].question} questionNumber={currentQuestionIndex + 1} totalQuestions={questions.length} hint={questions[currentQuestionIndex].hint} onSubmit={handleAnswerSubmit} />
+              </div> : <div className="py-8">
                 <div className="max-w-4xl mx-auto">
                   <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold mb-3">Phỏng vấn hoàn thành!</h2>
@@ -205,8 +163,7 @@ const MockInterview = () => {
                   </div>
                   
                   <div className="space-y-6">
-                    {answerResults.map((result, index) => (
-                      <Card key={index} className="mb-6">
+                    {answerResults.map((result, index) => <Card key={index} className="mb-6">
                         <CardHeader className="pb-2">
                           <div className="flex justify-between items-center">
                             <CardTitle className="text-lg">Câu hỏi {index + 1}</CardTitle>
@@ -239,28 +196,21 @@ const MockInterview = () => {
                           <div>
                             <div className="font-medium mb-1">Điểm cần cải thiện:</div>
                             <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                              {result.improvementPoints.map((point, i) => (
-                                <li key={i}>{point}</li>
-                              ))}
+                              {result.improvementPoints.map((point, i) => <li key={i}>{point}</li>)}
                             </ul>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
+                      </Card>)}
                   </div>
                   
                   <div className="flex justify-center mt-8">
-                    <Button 
-                      onClick={() => {
-                        setInterviewStarted(false);
-                        setInterviewFinished(false);
-                        setCurrentQuestionIndex(0);
-                        setAnswerResults([]);
-                        setTotalTime(0);
-                      }}
-                      variant="outline"
-                      className="mr-4"
-                    >
+                    <Button onClick={() => {
+                setInterviewStarted(false);
+                setInterviewFinished(false);
+                setCurrentQuestionIndex(0);
+                setAnswerResults([]);
+                setTotalTime(0);
+              }} variant="outline" className="mr-4">
                       Thử lại
                     </Button>
                     <Button onClick={() => navigate("/")}>
@@ -268,13 +218,9 @@ const MockInterview = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
-          </>
-        )}
+              </div>}
+          </>}
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default MockInterview;
