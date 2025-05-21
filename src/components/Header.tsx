@@ -1,11 +1,23 @@
 
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FileText, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const checkResumeDataAndNavigate = (path: string) => {
+    const resumeData = localStorage.getItem("resumeSections");
+    
+    if (!resumeData || JSON.parse(resumeData).length === 0) {
+      toast.error("Vui lòng tải lên hồ sơ trước khi truy cập tính năng này");
+      navigate("/upload");
+    } else {
+      navigate(path);
+    }
+  };
   
   return (
     <header className="w-full py-4 px-6 flex items-center justify-between border-b">
@@ -29,7 +41,7 @@ const Header = () => {
           <span>Hồ sơ</span>
         </Button>
         <Button 
-          onClick={() => navigate("/evaluation")}
+          onClick={() => checkResumeDataAndNavigate("/evaluation")}
           variant={location.pathname === "/evaluation" ? "default" : "ghost"} 
           className="gap-2"
         >
@@ -37,7 +49,7 @@ const Header = () => {
           <span>Đánh giá</span>
         </Button>
         <Button 
-          onClick={() => navigate("/mock-interview")}
+          onClick={() => checkResumeDataAndNavigate("/mock-interview")}
           variant={location.pathname === "/mock-interview" ? "default" : "ghost"} 
           className="gap-2"
         >

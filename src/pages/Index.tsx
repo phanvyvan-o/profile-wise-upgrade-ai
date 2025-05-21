@@ -63,7 +63,7 @@ const Index = () => {
         </section>
         
         <section className="py-12 text-center">
-          <h2 className="text-3xl font-bold mb-6">Tăng cơ hội thành công trong việc xin việc</h2>
+          <h2 className="text-3xl font-bold mb-6">Tăng cơ hội thành công khi xin việc</h2>
           <p className="text-lg text-muted-foreground max-w-[800px] mx-auto mb-8">
             Ứng dụng của chúng tôi sử dụng công nghệ AI tiên tiến để phân tích và cải thiện hồ sơ xin việc của bạn, giúp bạn nổi bật trong mắt nhà tuyển dụng.
           </p>

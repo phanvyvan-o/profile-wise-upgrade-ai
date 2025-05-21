@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -35,20 +34,20 @@ const MockInterview = () => {
   const [totalTime, setTotalTime] = useState(0);
   
   useEffect(() => {
+    // Check if resume data exists in localStorage
+    const resumeData = localStorage.getItem("resumeSections");
+    
+    if (!resumeData || JSON.parse(resumeData).length === 0) {
+      toast.error("Không tìm thấy dữ liệu hồ sơ. Vui lòng quay lại trang tải lên.");
+      navigate("/upload");
+      return;
+    }
+    
     const fetchQuestions = async () => {
       try {
-        // For a real implementation, this should use the resume data to generate relevant questions
-        const resumeData = localStorage.getItem("resumeSectionsForInterview");
-        if (!resumeData) {
-          // No resume data found, use default job type
-          const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
-          setQuestions(fetchedQuestions);
-        } else {
-          // Use the resume data to determine job type
-          // For now, just use "general" as job type
-          const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
-          setQuestions(fetchedQuestions);
-        }
+        // Use resume data to generate relevant questions
+        const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
+        setQuestions(fetchedQuestions);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -56,8 +55,9 @@ const MockInterview = () => {
         setIsLoading(false);
       }
     };
+    
     fetchQuestions();
-  }, []);
+  }, [navigate]);
   
   const startInterview = () => {
     setInterviewStarted(true);

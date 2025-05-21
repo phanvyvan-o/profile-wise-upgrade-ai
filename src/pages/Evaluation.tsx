@@ -32,18 +32,19 @@ const Evaluation = () => {
   const [improvedContent, setImprovedContent] = useState<Record<string, string>>({});
   
   useEffect(() => {
-    // Load data from localStorage
-    const resumeData = localStorage.getItem("resumeSectionsForEval");
-    const jdData = localStorage.getItem("jobDescription");
+    // Check if resume data exists in localStorage
+    const resumeData = localStorage.getItem("resumeSections");
     
-    if (resumeData) {
-      setResumeSections(JSON.parse(resumeData));
-    } else {
+    if (!resumeData || JSON.parse(resumeData).length === 0) {
       toast.error("Không tìm thấy dữ liệu hồ sơ. Vui lòng quay lại trang tải lên.");
       navigate("/upload");
       return;
     }
     
+    setResumeSections(JSON.parse(resumeData));
+    
+    // Get job description if available
+    const jdData = localStorage.getItem("jobDescription");
     if (jdData) {
       setJobDescription(jdData);
     }
@@ -54,7 +55,7 @@ const Evaluation = () => {
       resumeContent[section.title] = section.content;
     });
     
-    // Analyze resume with mock API
+    // Analyze resume with API
     const analyzeResume = async () => {
       try {
         const resumeAnalysis = await geminiApi.analyzeResume(resumeContent);
