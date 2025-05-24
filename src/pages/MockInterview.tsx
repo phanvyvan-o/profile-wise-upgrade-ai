@@ -7,7 +7,8 @@ import InterviewQuestion from "@/components/InterviewQuestion";
 import { geminiApi } from "@/services/geminiApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Clock, Home } from "lucide-react";
+import { ArrowLeft, ArrowRight, Clock, Home, RotateCcw } from "lucide-react";
+
 interface InterviewQuestionType {
   question: string;
   hint: string;
@@ -200,17 +201,19 @@ const MockInterview = () => {
                       </Card>)}
                   </div>
                   
-                  <div className="flex justify-center mt-8">
+                  <div className="flex justify-center mt-8 gap-4">
                     <Button onClick={() => {
                 setInterviewStarted(false);
                 setInterviewFinished(false);
                 setCurrentQuestionIndex(0);
                 setAnswerResults([]);
                 setTotalTime(0);
-              }} variant="outline" className="mr-4">
+              }} variant="outline" className="gap-2">
+                      <RotateCcw className="h-4 w-4" />
                       Thử lại
                     </Button>
-                    <Button onClick={() => navigate("/")}>
+                    <Button onClick={() => navigate("/")} className="gap-2">
+                      <Home className="h-4 w-4" />
                       Quay lại trang chủ
                     </Button>
                   </div>
