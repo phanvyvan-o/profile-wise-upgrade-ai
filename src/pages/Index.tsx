@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, MessageSquare, Book, ArrowRight } from "lucide-react";
+import { FileText, MessageSquare, CheckCircle, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +37,7 @@ const Index = () => {
             <div className="animate-fade-in" style={{
             animationDelay: '150ms'
           }}>
-              <FeatureCard title="Đánh giá hồ sơ" description="Nhận đánh giá chi tiết về hồ sơ của bạn và gợi ý cải thiện để tăng cơ hội thành công khi ứng tuyển." icon={<Book className="h-5 w-5" />} />
+              <FeatureCard title="Đánh giá hồ sơ" description="Nhận đánh giá chi tiết về hồ sơ của bạn và gợi ý cải thiện để tăng cơ hội thành công khi ứng tuyển." icon={<CheckCircle className="h-5 w-5" />} />
             </div>
             
             <div className="animate-fade-in" style={{

@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FileText, MessageSquare, Menu } from "lucide-react";
+import { FileText, MessageSquare, Menu, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import {
@@ -60,7 +60,7 @@ const Header = () => {
           variant={location.pathname === "/evaluation" ? "default" : "ghost"} 
           className="gap-2"
         >
-          <FileText size={18} />
+          <CheckCircle size={18} />
           <span>Đánh giá</span>
         </Button>
         <Button 
@@ -98,7 +98,7 @@ const Header = () => {
                 variant={location.pathname === "/evaluation" ? "default" : "ghost"} 
                 className="w-full justify-start gap-2"
               >
-                <FileText size={18} />
+                <CheckCircle size={18} />
                 <span>Đánh giá</span>
               </Button>
               <Button 
