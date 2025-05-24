@@ -1,12 +1,21 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FileText, MessageSquare } from "lucide-react";
+import { FileText, MessageSquare, Menu } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
   
   const checkResumeDataAndNavigate = (path: string) => {
     const resumeData = localStorage.getItem("resumeSections");
@@ -17,6 +26,12 @@ const Header = () => {
     } else {
       navigate(path);
     }
+    setIsOpen(false);
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsOpen(false);
   };
   
   return (
@@ -59,16 +74,44 @@ const Header = () => {
       </nav>
       
       <div className="md:hidden">
-        <Button 
-          onClick={() => {}}
-          variant="ghost"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="4" x2="20" y1="12" y2="12" />
-            <line x1="4" x2="20" y1="6" y2="6" />
-            <line x1="4" x2="20" y1="18" y2="18" />
-          </svg>
-        </Button>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetHeader>
+              <SheetTitle>Menu</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 mt-6">
+              <Button 
+                onClick={() => handleNavigation("/upload")}
+                variant={location.pathname === "/upload" ? "default" : "ghost"} 
+                className="w-full justify-start gap-2"
+              >
+                <FileText size={18} />
+                <span>Hồ sơ</span>
+              </Button>
+              <Button 
+                onClick={() => checkResumeDataAndNavigate("/evaluation")}
+                variant={location.pathname === "/evaluation" ? "default" : "ghost"} 
+                className="w-full justify-start gap-2"
+              >
+                <FileText size={18} />
+                <span>Đánh giá</span>
+              </Button>
+              <Button 
+                onClick={() => checkResumeDataAndNavigate("/mock-interview")}
+                variant={location.pathname === "/mock-interview" ? "default" : "ghost"} 
+                className="w-full justify-start gap-2"
+              >
+                <MessageSquare size={18} />
+                <span>Phỏng vấn</span>
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );
