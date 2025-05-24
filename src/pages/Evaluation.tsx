@@ -8,6 +8,7 @@ import { geminiApi } from "@/services/geminiApi";
 import { ArrowLeft, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
 interface ResumeSection {
   id: string;
   title: string;
@@ -79,38 +80,47 @@ const Evaluation = () => {
         {isLoading ? <div className="py-20 text-center">
             <div className="mb-4 text-lg font-medium">Đang phân tích hồ sơ của bạn...</div>
             <Progress value={45} className="w-full max-w-md mx-auto" />
-          </div> : <div className="grid md:grid-cols-2 gap-8">
-            {/* Original Resume Content */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Hồ sơ gốc</h2>
-              
-              <div className="space-y-6 p-6 border rounded-lg resume-container">
-                {resumeSections.map(section => <div key={section.id} className="mb-6">
-                    <h3 className="text-lg font-medium mb-2">{section.title}</h3>
-                    <div className="text-sm text-muted-foreground">
-                      <HighlightedText originalText={section.content} improvements={improvements.filter(improvement => improvement.section === section.title).map(improvement => ({
-                  original: improvement.original,
-                  suggestion: improvement.suggestion,
-                  reason: improvement.reason
-                }))} />
-                    </div>
-                  </div>)}
+          </div> : <>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Original Resume Content */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Hồ sơ gốc</h2>
+                
+                <div className="space-y-6 p-6 border rounded-lg resume-container">
+                  {resumeSections.map(section => <div key={section.id} className="mb-6">
+                      <h3 className="text-lg font-medium mb-2">{section.title}</h3>
+                      <div className="text-sm text-muted-foreground">
+                        <HighlightedText originalText={section.content} improvements={improvements.filter(improvement => improvement.section === section.title).map(improvement => ({
+                    original: improvement.original,
+                    suggestion: improvement.suggestion,
+                    reason: improvement.reason
+                  }))} />
+                      </div>
+                    </div>)}
+                </div>
+                
+                <div className="mt-4 text-sm text-muted-foreground">
+                  <p>* Di chuột qua văn bản được đánh dấu để xem các đề xuất cải thiện</p>
+                </div>
               </div>
               
-              <div className="mt-4 text-sm text-muted-foreground">
-                <p>* Di chuột qua văn bản được đánh dấu để xem các đề xuất cải thiện</p>
+              {/* Improved Resume Content */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Hồ sơ được cải thiện</h2>
+                
+                <div className="space-y-4 resume-container">
+                  {Object.entries(improvedContent).map(([title, content]) => <ImprovedTextSection key={title} title={title} content={content} />)}
+                </div>
               </div>
             </div>
             
-            {/* Improved Resume Content */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Hồ sơ được cải thiện</h2>
-              
-              <div className="space-y-4 resume-container">
-                {Object.entries(improvedContent).map(([title, content]) => <ImprovedTextSection key={title} title={title} content={content} />)}
-              </div>
+            <div className="flex justify-center mt-8">
+              <Button onClick={() => navigate("/")} className="gap-2">
+                <Home className="h-4 w-4" />
+                Quay lại trang chủ
+              </Button>
             </div>
-          </div>}
+          </>}
       </main>
     </div>;
 };
