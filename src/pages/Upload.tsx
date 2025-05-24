@@ -3,10 +3,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, ArrowRight, MessageSquare } from "lucide-react";
+import { ArrowRight, MessageSquare } from "lucide-react";
 import Header from "@/components/Header";
 import FileUpload from "@/components/FileUpload";
-import SectionInput from "@/components/SectionInput";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +23,6 @@ const Upload = () => {
   const [jobDescriptionFile, setJobDescriptionFile] = useState<File | null>(null);
   const [jobDescriptionText, setJobDescriptionText] = useState("");
   const [resumeSections, setResumeSections] = useLocalStorage<ResumeSection[]>("resumeSections", []);
-  const [activeTab, setActiveTab] = useState("upload");
 
   const handleFileUpload = (file: File) => {
     setResumeFile(file);
@@ -50,31 +48,7 @@ const Upload = () => {
     ];
     
     setResumeSections(mockResumeSections);
-    setActiveTab("manual");
     toast.success("CV đã được tải lên và phân tích thành công");
-  };
-
-  const handleAddSection = () => {
-    setResumeSections([
-      ...resumeSections,
-      {
-        id: uuidv4(),
-        title: "",
-        content: ""
-      }
-    ]);
-  };
-
-  const handleRemoveSection = (id: string) => {
-    setResumeSections(resumeSections.filter(section => section.id !== id));
-  };
-
-  const handleSectionChange = (id: string, title: string, content: string) => {
-    setResumeSections(
-      resumeSections.map(section => 
-        section.id === id ? { ...section, title, content } : section
-      )
-    );
   };
 
   const handleJobDescriptionFileUpload = (file: File) => {
@@ -89,7 +63,7 @@ const Upload = () => {
   const handleEvaluate = () => {
     // Check if resume sections exist
     if (resumeSections.length === 0) {
-      toast.error("Vui lòng tải lên CV hoặc nhập thông tin hồ sơ của bạn trước");
+      toast.error("Vui lòng tải lên CV trước");
       return;
     }
     
@@ -104,7 +78,7 @@ const Upload = () => {
   const handleStartMockInterview = () => {
     // Check if resume sections exist
     if (resumeSections.length === 0) {
-      toast.error("Vui lòng tải lên CV hoặc nhập thông tin hồ sơ của bạn trước");
+      toast.error("Vui lòng tải lên CV trước");
       return;
     }
     
@@ -127,44 +101,20 @@ const Upload = () => {
           <div className="space-y-6">
             <h2 className="text-xl font-semibold">Hồ sơ của bạn</h2>
             
-            <Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="upload">Tải lên CV</TabsTrigger>
-                <TabsTrigger value="manual">Nhập thủ công</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="upload" className="mt-4">
-                <FileUpload
-                  acceptedTypes=".pdf,.doc,.docx"
-                  onFileUpload={handleFileUpload}
-                  label="Tải lên CV của bạn"
-                />
-              </TabsContent>
-              
-              <TabsContent value="manual" className="mt-4">
-                <div className="space-y-4">
-                  {resumeSections.map(section => (
-                    <SectionInput
-                      key={section.id}
-                      id={section.id}
-                      initialTitle={section.title}
-                      initialContent={section.content}
-                      onChange={handleSectionChange}
-                      onRemove={handleRemoveSection}
-                    />
-                  ))}
-                  
-                  <Button 
-                    variant="outline" 
-                    onClick={handleAddSection}
-                    className="w-full py-6 border-dashed flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Thêm phần mới</span>
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <FileUpload
+              acceptedTypes=".pdf,.doc,.docx"
+              onFileUpload={handleFileUpload}
+              label="Tải lên CV của bạn"
+            />
+            
+            {resumeSections.length > 0 && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 font-medium">✓ CV đã được tải lên thành công</p>
+                <p className="text-green-600 text-sm mt-1">
+                  Đã phân tích {resumeSections.length} phần từ CV của bạn
+                </p>
+              </div>
+            )}
           </div>
           
           {/* Job Description Section */}
