@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/Header";
 import InterviewQuestion from "@/components/InterviewQuestion";
+import JobSelectionScreen from "@/components/JobSelectionScreen";
 import { geminiApi } from "@/services/geminiApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,6 +15,7 @@ interface InterviewQuestionType {
   question: string;
   hint: string;
 }
+
 interface AnswerResult {
   question: string;
   answer: string;
@@ -21,47 +24,76 @@ interface AnswerResult {
   improvementPoints: string[];
   score: number;
 }
+
 const MockInterview = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState<InterviewQuestionType[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [interviewFinished, setInterviewFinished] = useState(false);
   const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
   const [totalTime, setTotalTime] = useState(0);
+  const [hasResume, setHasResume] = useState(false);
+  const [showJobSelection, setShowJobSelection] = useState(false);
+  const [selectedJobType, setSelectedJobType] = useState("");
+
   useEffect(() => {
     // Check if resume data exists in localStorage
     const resumeData = localStorage.getItem("resumeSections");
-    if (!resumeData || JSON.parse(resumeData).length === 0) {
-      toast.error("Không tìm thấy dữ liệu hồ sơ. Vui lòng quay lại trang tải lên.");
-      navigate("/upload");
-      return;
+    const hasResumeData = resumeData && JSON.parse(resumeData).length > 0;
+    setHasResume(hasResumeData);
+    
+    if (hasResumeData) {
+      // If resume exists, fetch questions based on resume
+      fetchQuestionsFromResume();
+    } else {
+      // If no resume, show job selection
+      setShowJobSelection(true);
     }
-    const fetchQuestions = async () => {
-      try {
-        // Use resume data to generate relevant questions
-        const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
-        setQuestions(fetchedQuestions);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching questions:", error);
-        toast.error("Đã xảy ra lỗi khi tải câu hỏi phỏng vấn. Vui lòng thử lại.");
-        setIsLoading(false);
-      }
-    };
-    fetchQuestions();
-  }, [navigate]);
+  }, []);
+
+  const fetchQuestionsFromResume = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedQuestions = await geminiApi.getInterviewQuestions("general");
+      setQuestions(fetchedQuestions);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      toast.error("Đã xảy ra lỗi khi tải câu hỏi phỏng vấn. Vui lòng thử lại.");
+      setIsLoading(false);
+    }
+  };
+
+  const fetchQuestionsFromJobType = async (jobType: string) => {
+    setIsLoading(true);
+    try {
+      const fetchedQuestions = await geminiApi.getInterviewQuestions(jobType);
+      setQuestions(fetchedQuestions);
+      setShowJobSelection(false);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      toast.error("Đã xảy ra lỗi khi tải câu hỏi phỏng vấn. Vui lòng thử lại.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleJobSelect = (jobType: string) => {
+    setSelectedJobType(jobType);
+    fetchQuestionsFromJobType(jobType);
+  };
+
   const startInterview = () => {
     setInterviewStarted(true);
   };
+
   const handleAnswerSubmit = async (answer: string, timeSpent: number) => {
     const currentQuestion = questions[currentQuestionIndex];
     try {
-      // Evaluate the answer
       const evaluation = await geminiApi.evaluateAnswer(currentQuestion.question, answer);
 
-      // Add to results
       const result: AnswerResult = {
         question: currentQuestion.question,
         answer,
@@ -73,7 +105,6 @@ const MockInterview = () => {
       setAnswerResults([...answerResults, result]);
       setTotalTime(totalTime + timeSpent);
 
-      // Move to next question or finish
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
@@ -84,22 +115,35 @@ const MockInterview = () => {
       toast.error("Đã xảy ra lỗi khi đánh giá câu trả lời. Vui lòng thử lại.");
     }
   };
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
+
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return "text-green-600";
     if (score >= 0.6) return "text-amber-600";
     return "text-red-600";
   };
+
   const getAverageScore = () => {
     if (answerResults.length === 0) return 0;
     const total = answerResults.reduce((sum, result) => sum + result.score, 0);
     return total / answerResults.length;
   };
-  return <div className="min-h-screen flex flex-col">
+
+  const resetInterview = () => {
+    setInterviewStarted(false);
+    setInterviewFinished(false);
+    setCurrentQuestionIndex(0);
+    setAnswerResults([]);
+    setTotalTime(0);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 container max-w-5xl mx-auto px-4 py-8">
@@ -108,20 +152,41 @@ const MockInterview = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-3xl font-bold">Phỏng vấn thử</h1>
-          <div className="flex-grow"></div>
-          
         </div>
         
-        {isLoading ? <div className="py-20 text-center">
-            <div className="mb-4 text-lg font-medium">Đang chuẩn bị câu hỏi phỏng vấn...</div>
+        {showJobSelection ? (
+          <JobSelectionScreen onJobSelect={handleJobSelect} />
+        ) : isLoading ? (
+          <div className="py-20 text-center">
+            <div className="mb-4 text-lg font-medium">
+              {hasResume 
+                ? "Đang chuẩn bị câu hỏi phỏng vấn dựa trên CV của bạn..." 
+                : `Đang chuẩn bị câu hỏi phỏng vấn cho ngành ${selectedJobType}...`
+              }
+            </div>
             <Progress value={70} className="w-full max-w-md mx-auto" />
-          </div> : <>
-            {!interviewStarted ? <div className="max-w-3xl mx-auto text-center py-12">
+          </div>
+        ) : (
+          <>
+            {!interviewStarted ? (
+              <div className="max-w-3xl mx-auto text-center py-12">
                 <h2 className="text-2xl font-bold mb-4">Sẵn sàng cho phỏng vấn?</h2>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Chúng tôi đã chuẩn bị {questions.length} câu hỏi phỏng vấn phù hợp với hồ sơ của bạn. 
+                  Chúng tôi đã chuẩn bị {questions.length} câu hỏi phỏng vấn 
+                  {hasResume 
+                    ? " phù hợp với hồ sơ của bạn" 
+                    : ` cho ngành ${selectedJobType}`
+                  }. 
                   Mỗi câu trả lời sẽ được đánh giá và bạn sẽ nhận được phản hồi chi tiết.
                 </p>
+                
+                {!hasResume && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-800 text-sm">
+                      💡 Mẹo: Tải lên CV để nhận câu hỏi được cá nhân hóa hơn cho hồ sơ của bạn!
+                    </p>
+                  </div>
+                )}
                 
                 <div className="mb-8 space-y-4">
                   <div className="p-4 bg-accent rounded-lg">
@@ -135,13 +200,33 @@ const MockInterview = () => {
                   </div>
                 </div>
                 
-                <Button onClick={startInterview} size="lg" className="gap-2">
-                  <span>Bắt đầu phỏng vấn</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div> : !interviewFinished ? <div className="py-8">
-                <InterviewQuestion question={questions[currentQuestionIndex].question} questionNumber={currentQuestionIndex + 1} totalQuestions={questions.length} hint={questions[currentQuestionIndex].hint} onSubmit={handleAnswerSubmit} />
-              </div> : <div className="py-8">
+                <div className="flex gap-4 justify-center">
+                  {!hasResume && (
+                    <Button 
+                      onClick={() => setShowJobSelection(true)} 
+                      variant="outline"
+                    >
+                      Chọn ngành khác
+                    </Button>
+                  )}
+                  <Button onClick={startInterview} size="lg" className="gap-2">
+                    <span>Bắt đầu phỏng vấn</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : !interviewFinished ? (
+              <div className="py-8">
+                <InterviewQuestion 
+                  question={questions[currentQuestionIndex].question} 
+                  questionNumber={currentQuestionIndex + 1} 
+                  totalQuestions={questions.length} 
+                  hint={questions[currentQuestionIndex].hint} 
+                  onSubmit={handleAnswerSubmit} 
+                />
+              </div>
+            ) : (
+              <div className="py-8">
                 <div className="max-w-4xl mx-auto">
                   <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold mb-3">Phỏng vấn hoàn thành!</h2>
@@ -161,7 +246,8 @@ const MockInterview = () => {
                   </div>
                   
                   <div className="space-y-6">
-                    {answerResults.map((result, index) => <Card key={index} className="mb-6">
+                    {answerResults.map((result, index) => (
+                      <Card key={index} className="mb-6">
                         <CardHeader className="pb-2">
                           <div className="flex justify-between items-center">
                             <CardTitle className="text-lg">Câu hỏi {index + 1}</CardTitle>
@@ -194,21 +280,18 @@ const MockInterview = () => {
                           <div>
                             <div className="font-medium mb-1">Điểm cần cải thiện:</div>
                             <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                              {result.improvementPoints.map((point, i) => <li key={i}>{point}</li>)}
+                              {result.improvementPoints.map((point, i) => (
+                                <li key={i}>{point}</li>
+                              ))}
                             </ul>
                           </div>
                         </CardContent>
-                      </Card>)}
+                      </Card>
+                    ))}
                   </div>
                   
                   <div className="flex justify-center mt-8 gap-4">
-                    <Button onClick={() => {
-                setInterviewStarted(false);
-                setInterviewFinished(false);
-                setCurrentQuestionIndex(0);
-                setAnswerResults([]);
-                setTotalTime(0);
-              }} variant="outline" className="gap-2">
+                    <Button onClick={resetInterview} variant="outline" className="gap-2">
                       <RotateCcw className="h-4 w-4" />
                       Thử lại
                     </Button>
@@ -218,9 +301,13 @@ const MockInterview = () => {
                     </Button>
                   </div>
                 </div>
-              </div>}
-          </>}
+              </div>
+            )}
+          </>
+        )}
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default MockInterview;

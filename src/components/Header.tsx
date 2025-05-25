@@ -64,7 +64,7 @@ const Header = () => {
           <span>Đánh giá</span>
         </Button>
         <Button 
-          onClick={() => checkResumeDataAndNavigate("/mock-interview")}
+          onClick={() => navigate("/mock-interview")}
           variant={location.pathname === "/mock-interview" ? "default" : "ghost"} 
           className="gap-2"
         >
@@ -102,7 +102,7 @@ const Header = () => {
                 <span>Đánh giá</span>
               </Button>
               <Button 
-                onClick={() => checkResumeDataAndNavigate("/mock-interview")}
+                onClick={() => handleNavigation("/mock-interview")}
                 variant={location.pathname === "/mock-interview" ? "default" : "ghost"} 
                 className="w-full justify-start gap-2"
               >

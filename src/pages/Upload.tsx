@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, MessageSquare } from "lucide-react";
+import { ArrowRight, MessageSquare, Trash2 } from "lucide-react";
 import Header from "@/components/Header";
 import FileUpload from "@/components/FileUpload";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -60,6 +60,22 @@ const Upload = () => {
     toast.success("Mô tả công việc đã được tải lên thành công");
   };
 
+  const handleClearResume = () => {
+    setResumeFile(null);
+    setResumeSections([]);
+    localStorage.removeItem("resumeSections");
+    localStorage.removeItem("resumeSectionsForEval");
+    localStorage.removeItem("resumeSectionsForInterview");
+    toast.success("Đã xóa CV thành công");
+  };
+
+  const handleClearJobDescription = () => {
+    setJobDescriptionFile(null);
+    setJobDescriptionText("");
+    localStorage.removeItem("jobDescription");
+    toast.success("Đã xóa mô tả công việc thành công");
+  };
+
   const handleEvaluate = () => {
     // Check if resume sections exist
     if (resumeSections.length === 0) {
@@ -76,14 +92,10 @@ const Upload = () => {
   };
 
   const handleStartMockInterview = () => {
-    // Check if resume sections exist
-    if (resumeSections.length === 0) {
-      toast.error("Vui lòng tải lên CV trước");
-      return;
+    // Save to localStorage for use in mock interview if resume exists
+    if (resumeSections.length > 0) {
+      localStorage.setItem("resumeSectionsForInterview", JSON.stringify(resumeSections));
     }
-    
-    // Save to localStorage for use in mock interview
-    localStorage.setItem("resumeSectionsForInterview", JSON.stringify(resumeSections));
     
     // Navigate to mock interview page
     navigate("/mock-interview");
@@ -99,7 +111,20 @@ const Upload = () => {
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           {/* Resume Upload Section */}
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Hồ sơ của bạn</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Hồ sơ của bạn</h2>
+              {resumeSections.length > 0 && (
+                <Button 
+                  onClick={handleClearResume}
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Xóa CV
+                </Button>
+              )}
+            </div>
             
             <FileUpload
               acceptedTypes=".pdf,.doc,.docx"
@@ -119,7 +144,20 @@ const Upload = () => {
           
           {/* Job Description Section */}
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Mô tả công việc (tùy chọn)</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Mô tả công việc (tùy chọn)</h2>
+              {(jobDescriptionFile || jobDescriptionText) && (
+                <Button 
+                  onClick={handleClearJobDescription}
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Xóa JD
+                </Button>
+              )}
+            </div>
             
             <Tabs defaultValue="upload">
               <TabsList className="grid w-full grid-cols-2">
@@ -158,6 +196,15 @@ const Upload = () => {
             <span>Bắt đầu phỏng vấn thử</span>
           </Button>
         </div>
+
+        {resumeSections.length === 0 && (
+          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800 text-center">
+              💡 Mẹo: Bạn có thể bắt đầu phỏng vấn thử ngay cả khi chưa tải CV. 
+              Hệ thống sẽ cho phép bạn chọn ngành nghề để tạo câu hỏi phù hợp!
+            </p>
+          </div>
+        )}
       </main>
     </div>
   );
