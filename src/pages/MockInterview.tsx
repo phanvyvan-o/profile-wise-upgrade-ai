@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -200,11 +199,12 @@ const MockInterview = () => {
                   </div>
                 </div>
                 
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {!hasResume && (
                     <Button 
                       onClick={() => setShowJobSelection(true)} 
                       variant="outline"
+                      size="lg"
                     >
                       Chọn ngành khác
                     </Button>
